@@ -2,13 +2,10 @@
 # -*- coding: utf-8 -*-
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
 
 requirements = [
     'Click',
@@ -28,7 +25,7 @@ setup(
     url='https://github.com/cmollet/epsg_ident',
     install_requires=requirements,
     license="ISCL",
-    py_modules=['epsg_ident'],
+    packages=find_packages(),
     entry_points='''
         [console_scripts]
         epsg_ident=epsg_ident:cli
