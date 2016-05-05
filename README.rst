@@ -1,8 +1,6 @@
 epsg\_ident
 ===========
 
-Travis CI stuff goes here
-
 Overview
 --------
 

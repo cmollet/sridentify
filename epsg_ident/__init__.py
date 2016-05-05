@@ -96,6 +96,7 @@ class EpsgIdent:
         if api_resp.get('exact'):
             self.epsg_code = int(api_resp['codes'][0]['code'])
             self.save_to_db()
+            return self.epsg_code
         elif api_resp.get('codes'):
             # TODO: prompt user to pick one
             pass

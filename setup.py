@@ -23,6 +23,7 @@ setup(
     author="Cory Mollet",
     author_email='cory@corymollet.com',
     url='https://github.com/cmollet/epsg_ident',
+    package_data={'epsg_ident': ['esri_epsg.db']},
     install_requires=requirements,
     license="ISCL",
     packages=find_packages(),
