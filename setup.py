@@ -17,7 +17,7 @@ requirements = [
 
 setup(
     name='epsg_ident',
-    version='0.1.0',
+    version='0.1.1',
     description="Quickly get the EPSG code from a .prj file or WKT",
     long_description=readme,
     author="Cory Mollet",
