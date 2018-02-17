@@ -1,47 +1,51 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+from setuptools import setup
 
-from setuptools import setup, find_packages
+NAME = 'sridentify'
+DESCRIPTIOIN = 'Identify the EPSG code from a .prj file'
+URL = 'https://github.com/cmollet/sridentify'
+EMAIL = 'holla@corymollet.com'
+AUTHOR = 'Cory Mollet'
+VERSION = '0.3.0'
+
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = [
-    'Click',
-    'flake8',
-    'tox',
-    'twine'
-]
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 
 setup(
-    name='epsg_ident',
-    version='0.1.1',
-    description="Quickly get the EPSG code from a .prj file or WKT",
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTIOIN,
     long_description=readme,
-    author="Cory Mollet",
-    author_email='cory@corymollet.com',
-    url='https://github.com/cmollet/epsg_ident',
-    package_data={'epsg_ident': ['esri_epsg.db']},
-    install_requires=requirements,
-    license="ISCL",
-    packages=find_packages(),
-    entry_points='''
-        [console_scripts]
-        epsg_ident=epsg_ident:cli
-        ''',
-    keywords='epsg, gis, shapefile',
+    author=AUTHOR,
+    author_email=EMAIL,
+    url=URL,
+    package_data={'sridentify': ['epsg.db']},
+    license="MIT",
+    packages=["sridentify"],
+    entry_points={
+        'console_scripts': ['sridentify=sridentify.cli:main']
+        },
+    keywords='epsg, gis, shapefile, cli',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: ISC License (ISCL)',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Utilities',
     ],
