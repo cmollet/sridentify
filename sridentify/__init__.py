@@ -4,8 +4,20 @@ import logging
 import os
 import sqlite3
 import sys
-from urllib import request
-from urllib.parse import urlencode
+
+try:
+    # python 3.x
+    from urllib.request import urlopen, HTTPError
+    from urllib.parse import urlencode
+except ImportError:
+    # falls back to python2.x
+    from urllib2 import urlopen, HTTPError
+    from urllib import urlencode
+
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 logger = logging.getLogger(__name__)
 log_fmt = '%(levelname)s - %(message)s'
@@ -67,7 +79,7 @@ class Sridentify:
         # prjtext has a unique constraint on it, we should only ever fetchone()
         result = cur.fetchone()
         if not result:
-            self.call_api()
+            return self.call_api()
         else:
             self.epsg_code = result[0]
             return self.epsg_code
@@ -75,12 +87,12 @@ class Sridentify:
     def call_api(self):
         url = 'http://prj2epsg.org/search.json?'
         params = {
-                'mode': 'wkt',
-                'terms': self.prj
-                }
+            'mode': 'wkt',
+            'terms': self.prj
+        }
         try:
-            req = request.urlopen(url+urlencode(params))
-        except request.HTTPError as http_exc:
+            req = urlopen(url + urlencode(params))
+        except HTTPError as http_exc:
             logger.warning("""Failed to retrieve data from prj2epsg.org API:\n
                             Status: %s \n
                             Message: %s""" % (http_exc.code, http_exc.msg))
@@ -91,7 +103,7 @@ class Sridentify:
             except json.JSONDecodeError:
                 logger.warning('API call succeeded but response\
                         is not JSON: %s' % raw_resp)
-            self.process_api_result(resp)
+            return self.process_api_result(resp)
 
     def process_api_result(self, api_resp):
         if api_resp.get('exact'):
