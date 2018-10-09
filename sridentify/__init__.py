@@ -47,8 +47,8 @@ class Sridentify:
             elif self.mode == 'cli':
                 sys.exit(msg)
         try:
-            fp = open(path)
-            self.prj = fp.read()
+            with open(path, "r") as fp:
+                self.prj = fp.read()
         except IOError:
             msg = """ERROR - Unable to read\n%s\nfrom the filesystem, does it exist and do you have the necessary permissions?\n""" % path  # NOQA
             if self.mode == 'api':
