@@ -34,8 +34,8 @@ By default ``pip install --user`` will install to ``$HOME/.local`` and place the
 in ``$HOME/.local/bin``. You should add this to your ``$PATH`` if you want to run ``sridentify``
 without having to specify the full location to the executable.
 
-TL;DR
------
+Quickstart
+----------
 
 Command-Line usage
 ------------------
