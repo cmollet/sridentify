@@ -7,7 +7,7 @@ from setuptools import setup
 NAME = 'sridentify'
 DESCRIPTIOIN = 'Identify the EPSG code from a .prj file'
 URL = 'https://github.com/cmollet/sridentify'
-EMAIL = 'howtoreach@corymollet.com'
+EMAIL = 'contact@corymollet.com'
 AUTHOR = 'Cory Mollet'
 VERSION = '0.5.0'
 
@@ -30,6 +30,7 @@ setup(
     package_data={'sridentify': ['epsg.db']},
     license="MIT",
     packages=["sridentify"],
+    test_suite='tests',
     entry_points={
         'console_scripts': ['sridentify=sridentify.cli:main']
         },
