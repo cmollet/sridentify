@@ -4,9 +4,8 @@ from sridentify import Sridentify
 
 
 parser = argparse.ArgumentParser(
-        description="Identify an EPSG code from a .prj file",
-        )
-
+    description="Identify an EPSG code from a .prj file",
+)
 parser.add_argument('prj', help="The .prj file")
 
 
