@@ -56,7 +56,8 @@ class Sridentify(object):
             if self.mode == 'api':
                 raise IOError(msg)
             elif self.mode == 'cli':
-                sys.exit(msg)
+                sys.stderr.write(msg)
+                sys.exit(1)
 
     def get_epsg(self):
         """
