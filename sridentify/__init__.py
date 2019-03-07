@@ -26,11 +26,12 @@ logging.basicConfig(level=logging.INFO, format=log_fmt)
 
 class Sridentify(object):
 
-    def __init__(self, dbpath=None, prj=None, epsg_code=None, mode='api'):
+    def __init__(self, dbpath=None, prj=None, epsg_code=None, mode='api', call_remote_api=True):
         self.dbpath = dbpath
         self.prj = prj
         self.epsg_code = epsg_code
         self.mode = mode
+        self.call_remote_api = call_remote_api
 
         if self.dbpath is None:
             self.dbpath = os.path.abspath(os.path.join(
@@ -81,9 +82,9 @@ class Sridentify(object):
         cur.execute("SELECT epsg_code FROM prj_epsg WHERE prjtext = ?", (self.prj,))
         # prjtext has a unique constraint on it, we should only ever fetchone()
         result = cur.fetchone()
-        if not result:
+        if not result and self.call_remote_api:
             return self.call_api()
-        else:
+        elif result is not None:
             self.epsg_code = result[0]
             return self.epsg_code
 
