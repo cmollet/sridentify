@@ -40,5 +40,6 @@ class SridentifyCLIModeTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout.decode('utf-8').strip(), '')
 
+
 if __name__ == '__main__':
     unittest.main()
