@@ -87,7 +87,7 @@ Let's say you have a directory full of shapefiles of different projections that 
             shp2pgsql -s $epsg -g the_geom -ID $p.shp | psql -d my_db_name
         else
             # log the unmatched prjs to a file
-            echo "no EPSG code found for $p\n" >> bulk_import.log
+            echo "no EPSG code found for $p" >> bulk_import.log
         fi
     done
 
