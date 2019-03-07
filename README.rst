@@ -16,7 +16,7 @@ It's not complete, however, and in the event you test it against a WKT
 string not in the database it can optionally search the
 `prj2epsg.org <http://prj2epsg.org>`__ API. If the API returns an exact
 match, that code is returned and saved to the SQLite database. Handling
-several partial matches is currently planned, but not yet implemented. This feature can be disabled with the ``-n`` or ``--no-remote-api`` flags when running ``sridentify`` on the command line.
+several partial matches is currently planned, but not yet implemented. This feature can be disabled with the ``-n`` or ``--no-remote-api`` flags when running ``sridentify`` on the command line, or by instantiating with ``call_remote_api=False`` when using the Python API.
 
 ``sridentify`` is written in Python, 2- and 3-compatible, and has no external dependencies.
 
@@ -32,7 +32,7 @@ user running ``sridentify`` must have write permissions on the SQLite database i
 
 On most Linux systems ``pip install --user`` will install to ``$HOME/.local`` and place the executable script
 in ``$HOME/.local/bin``. You should add this to your ``$PATH`` if you want to run ``sridentify``
-without having to specify the full location to the executable. On OSX and Windows ``pip install --user`` should install it to somewhere already in your ``$PATH``, but this may depend on how Python/pip was installed on those systems.
+without having to specify the full location to the executable. On OS X and Windows ``pip install --user`` should install it to somewhere already in your ``$PATH``, but this may depend on how Python/pip was installed on those systems.
 
 Quickstart
 ----------
@@ -40,7 +40,7 @@ Quickstart
 Command-Line usage
 ------------------
 
-.. code:: bash
+::
 
     usage: sridentify [-h] [-n] prj
 
@@ -59,25 +59,22 @@ Cookbook
 
 .. code:: bash
 
+Get the EPSG code from a ``.prj`` file::
 
     $ sridentify seattle_land_use.prj
     2285
 
-    # Example use in conjunction with the `shp2pgsql` command-line utility
-    # that ships with PostGIS. Assuming you have a PostGIS-enabled database named `seattle`,
-    # and you have a shapefile called `seattle_land_use` that you want to import into that database
-    # but you're not sure what spatial projection the shapefile uses.
+Example use in conjunction with the ``shp2pgsql`` command-line utility that ships with `PostGIS <http://postgis.net/>`__. Assuming you have a PostGIS-enabled database named ``seattle``, and you have a shapefile called ``seattle_land_use`` that you want to import into that database but you're not sure what spatial projection the shapefile uses::
 
     $ shp2pgsql -s $(sridentify seattle_land_use.prj) -g the_geom -ID seattle_land_use.shp | psql -d seattle
 
-    # Do not call the prj2epsg.org API if no match found in the database
+Do not call the prj2epsg.org API if no match found in the database (e.g., if running in a script or if the API is unresponsive)::
+
     $ sridentify --no-remote-api seattle_land_use.prj
 
-Let's say you have a directory full of shapefiles of different projections that you want to bulk import into PostGIS. You could use ``sridentify -n`` in a script to skip calling the API for those that don't match anything in the database for speed's sake (and politeness of not hammering away at the free prj2epsg.org service!). For example:
+Let's say you have a directory full of shapefiles of different projections that you want to bulk import into PostGIS. You could use ``sridentify -n`` in a script to skip calling the API for those that don't match anything in the database for speed's sake (and politeness of not hammering away at the free prj2epsg.org service!). For example::
 
-.. code:: bash
-
-    #!/bin/bash
+    #!/usr/bin/env bash
 
     for p in $(find . -name "*.prj")
     do
@@ -108,6 +105,12 @@ Python API usage
     >>> ident = Sridentify(prj="""PROJCS["NAD_1983_StatePlane_Washington_North_FIPS_4601_Feet",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic"],PARAMETER["False_Easting",1640416.666666667],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",-120.8333333333333],PARAMETER["Standard_Parallel_1",47.5],PARAMETER["Standard_Parallel_2",48.73333333333333],PARAMETER["Latitude_Of_Origin",47.0],UNIT["Foot_US",0.3048006096012192]]""")
     >>> ident.get_epsg()
     2285
+    
+    >>> # Do not call the prj2epsg.org API if no match found
+    >>> ident = Sridentify(call_remote_api=False)
+    >>> ident.from_file('foo.prj')
+    >>> ident.get_epsg()  # would return None
+    >>>
 
 
 Background
@@ -119,7 +122,7 @@ open data portals. Local governments typically store and use GIS data in the `ma
 ESRI Shapefiles are a common format for publishing GIS data, although a "shapefile" with the ``.shp`` extension is really just data describing the geometry. Shapefiles are typically bundled with a ``dBase`` file ( ``.dbf`` extension ) which contains data attributes about the geometry and a small text file describing the spatial reference system of the geomtry in WKT format.
 
 ``sridentify`` is not meant to be a full-fledged client library to the actual
-EPSG database. If that's what you need, you're probably looking for something like `python-epsg <https://github.com/geo-data/python-epsg>`__
+EPSG database. If that's what you need, you're probably looking for something like `python-epsg <https://github.com/geo-data/python-epsg>`__.
 
 Rather, ``sridentify`` is for those looking to quickly identify the EPSG code
 of a shapefile, especially when `importing into PostGIS <http://postgis.net/docs/manual-2.2/using_postgis_dbmanagement.html#shp2pgsql_usage>`__ . Of course, you could use `ogr2ogr <http://www.gdal.org/ogr2ogr.html>`__
