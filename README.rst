@@ -7,16 +7,16 @@ Overview
 ``sridentify`` is a command-line utility and Python API for quickly
 identifying the `EPSG Registry Code <http://www.epsg-registry.org/>`__
 from a ``.prj`` file typically associated with `ESRI
-Shapefiles <https://en.wikipedia.org/wiki/Shapefile>`__. It ships with a
+Shapefiles <https://en.wikipedia.org/wiki/Shapefile>`__. It ships with an
 SQLite database containing mappings of `Well-known
-Text <https://en.wikipedia.org/wiki/Well-known_text>`__ strings to EPSG
+Text <https://en.wikipedia.org/wiki/Well-known_text_representation_of_coordinate_reference_systems>`__ strings to EPSG
 codes, the bulk of which was manually sourced and cleaned from `an ESRI
 website <https://developers.arcgis.com/javascript/jshelp/pcs.html>`__.
 It's not complete, however, and in the event you test it against a WKT
-string not in the database it will search the
+string not in the database it can optionally search the
 `prj2epsg.org <http://prj2epsg.org>`__ API. If the API returns an exact
 match, that code is returned and saved to the SQLite database. Handling
-several partial matches is currently planned, but not yet implemented.
+several partial matches is currently planned, but not yet implemented. This feature can be disabled with the ``-n`` or ``--no-remote-api`` flags when running ``sridentify`` on the command line.
 
 ``sridentify`` is written in Python, 2- and 3-compatible, and has no external dependencies.
 
@@ -30,9 +30,9 @@ The ``--user`` is important if installing system-wide (i.e., not in a virtualenv
 user running ``sridentify`` must have write permissions on the SQLite database in the event that
 ``sridentify`` tries to save a new result fetched from the ``prj2epsg`` API to the database.
 
-By default ``pip install --user`` will install to ``$HOME/.local`` and place the executable script
+On most Linux systems ``pip install --user`` will install to ``$HOME/.local`` and place the executable script
 in ``$HOME/.local/bin``. You should add this to your ``$PATH`` if you want to run ``sridentify``
-without having to specify the full location to the executable.
+without having to specify the full location to the executable. On OSX and Windows ``pip install --user`` should install it to somewhere already in your ``$PATH``, but this may depend on how Python/pip was installed on those systems.
 
 Quickstart
 ----------
@@ -41,6 +41,24 @@ Command-Line usage
 ------------------
 
 .. code:: bash
+
+    usage: sridentify [-h] [-n] prj
+
+    Identify an EPSG code from a .prj file
+
+    positional arguments:
+      prj                  The .prj file
+
+    optional arguments:
+      -h, --help           show this help message and exit
+      -n, --no-remote-api  Do not call the prj2epsg.org API if no match found in
+                           the database
+
+Cookbook
+^^^^^^^^
+
+.. code:: bash
+
 
     $ sridentify seattle_land_use.prj
     2285
@@ -51,6 +69,27 @@ Command-Line usage
     # but you're not sure what spatial projection the shapefile uses.
 
     $ shp2pgsql -s $(sridentify seattle_land_use.prj) -g the_geom -ID seattle_land_use.shp | psql -d seattle
+
+    # Do not call the prj2epsg.org API if no match found in the database
+    $ sridentify --no-remote-api seattle_land_use.prj
+
+Let's say you have a directory full of shapefiles of different projections that you want to bulk import into PostGIS. You could use ``sridentify -n`` in a script to skip calling the API for those that don't match anything in the database for speed's sake (and politeness of not hammering away at the free prj2epsg.org service!). For example:
+
+.. code:: bash
+
+    #!/bin/bash
+
+    for p in $(find . -name "*.prj")
+    do
+        epsg="$(sridentify -n $p)"
+        if [[ ! -z "$epsg" ]]
+        then
+            shp2pgsql -s $epsg -g the_geom -ID $p.shp | psql -d my_db_name
+        else
+            # log the unmatched prjs to a file
+            echo "no EPSG code found for $p\n" >> bulk_import.log
+        fi
+    done
 
 Python API usage
 -------------------
@@ -80,7 +119,7 @@ open data portals. Local governments typically store and use GIS data in the `ma
 ESRI Shapefiles are a common format for publishing GIS data, although a "shapefile" with the ``.shp`` extension is really just data describing the geometry. Shapefiles are typically bundled with a ``dBase`` file ( ``.dbf`` extension ) which contains data attributes about the geometry and a small text file describing the spatial reference system of the geomtry in WKT format.
 
 ``sridentify`` is not meant to be a full-fledged client library to the actual
-EPSG database, for that you're probably looking for something like `python-epsg <https://github.com/geo-data/python-epsg>`__
+EPSG database. If that's what you need, you're probably looking for something like `python-epsg <https://github.com/geo-data/python-epsg>`__
 
 Rather, ``sridentify`` is for those looking to quickly identify the EPSG code
 of a shapefile, especially when `importing into PostGIS <http://postgis.net/docs/manual-2.2/using_postgis_dbmanagement.html#shp2pgsql_usage>`__ . Of course, you could use `ogr2ogr <http://www.gdal.org/ogr2ogr.html>`__

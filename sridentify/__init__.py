@@ -24,17 +24,19 @@ log_fmt = '%(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
 
 
-class Sridentify:
+class Sridentify(object):
 
-    def __init__(self, dbpath=None, prj=None, epsg_code=None, mode='api'):
+    def __init__(self, dbpath=None, prj=None, epsg_code=None, mode='api', call_remote_api=True):
         self.dbpath = dbpath
         self.prj = prj
         self.epsg_code = epsg_code
         self.mode = mode
+        self.call_remote_api = call_remote_api
 
         if self.dbpath is None:
             self.dbpath = os.path.abspath(os.path.join(
-                os.path.dirname(__file__), 'epsg.db'))
+                os.path.dirname(__file__), 'epsg.db'
+            ))
         elif not os.path.exists(self.dbpath):
             raise FileNotFoundError("%s not found" % self.dbpath)
         self.conn = sqlite3.connect(self.dbpath)
@@ -50,11 +52,13 @@ class Sridentify:
             with open(path, "r") as fp:
                 self.prj = fp.read()
         except IOError:
-            msg = """ERROR - Unable to read\n%s\nfrom the filesystem, does it exist and do you have the necessary permissions?\n""" % path  # NOQA
+            msg = """ERROR - Unable to read\n%s\nfrom the filesystem.
+            Does it exist and do you have the necessary permissions?\n""" % path
             if self.mode == 'api':
                 raise IOError(msg)
             elif self.mode == 'cli':
-                sys.exit(msg)
+                sys.stderr.write(msg)
+                sys.exit(1)
 
     def get_epsg(self):
         """
@@ -78,9 +82,9 @@ class Sridentify:
         cur.execute("SELECT epsg_code FROM prj_epsg WHERE prjtext = ?", (self.prj,))
         # prjtext has a unique constraint on it, we should only ever fetchone()
         result = cur.fetchone()
-        if not result:
+        if not result and self.call_remote_api:
             return self.call_api()
-        else:
+        elif result is not None:
             self.epsg_code = result[0]
             return self.epsg_code
 
@@ -101,8 +105,12 @@ class Sridentify:
             try:
                 resp = json.loads(raw_resp.decode('utf-8'))
             except json.JSONDecodeError:
-                logger.warning('API call succeeded but response\
-                        is not JSON: %s' % raw_resp)
+                logger.warning(
+                    'API call succeeded but response is not JSON '
+                    'and was not saved to the database. '
+                    'Actual response was: \n%s' % raw_resp
+                )
+                return
             return self.process_api_result(resp)
 
     def process_api_result(self, api_resp):
@@ -121,11 +129,13 @@ class Sridentify:
         assert isinstance(self.epsg_code, int)
         try:
             cur = self.conn.cursor()
-            cur.execute("""INSERT INTO prj_epsg (prjtext, epsg_code) VALUES
-                    (?, ?)""", (self.prj, self.epsg_code))
+            cur.execute(
+                """INSERT INTO prj_epsg (prjtext, epsg_code) VALUES(?, ?)""",
+                (self.prj, self.epsg_code)
+            )
         except self.conn.IntegrityError:
             # This shouldn't ever happen unless the user tries to manually
             # enter a prjtext that already exists
             self.conn.rollback()
-            logger.warn("%s is already in the database" % self.prj)
+            logger.warning("%s is already in the database" % self.prj)
         self.conn.commit()

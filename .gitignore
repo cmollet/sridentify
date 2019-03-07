@@ -60,3 +60,6 @@ target/
 
 # vim
 *.sw[op]
+
+# PyCharm
+.idea/
