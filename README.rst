@@ -57,9 +57,9 @@ Command-Line usage
 Cookbook
 ^^^^^^^^
 
-.. code:: bash
+Get the EPSG code from a ``.prj`` file
 
-Get the EPSG code from a ``.prj`` file::
+.. code:: bash
 
     $ sridentify seattle_land_use.prj
     2285
@@ -72,7 +72,9 @@ Do not call the prj2epsg.org API if no match found in the database (e.g., if run
 
     $ sridentify --no-remote-api seattle_land_use.prj
 
-Let's say you have a directory full of shapefiles of different projections that you want to bulk import into PostGIS. You could use ``sridentify -n`` in a script to skip calling the API for those that don't match anything in the database for speed's sake (and politeness of not hammering away at the free prj2epsg.org service!). For example::
+Let's say you have a directory full of shapefiles of different projections that you want to bulk import into PostGIS. You could use ``sridentify -n`` in a script to skip calling the API for those that don't match anything in the database for speed's sake (and politeness of not hammering away at the free prj2epsg.org service!). For example:
+
+.. code:: bash
 
     #!/usr/bin/env bash
 
