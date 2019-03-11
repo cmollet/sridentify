@@ -16,7 +16,7 @@ class SridentifyAPIModeTest(unittest.TestCase):
     def setUp(self):
         self.this_dir = os.path.abspath(os.path.dirname(__file__))
         self.fixtures_dir = os.path.join(self.this_dir, 'fixtures')
-        self.prj_file = os.path.join(self.fixtures_dir, 'street_center_lines.prj')
+        self.prj_file = os.path.join(self.fixtures_dir, 'Central_Business_District.prj')
         self.ident = Sridentify()
 
     def test_from_file_raises_if_prj_does_not_exist(self):
