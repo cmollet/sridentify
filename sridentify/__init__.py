@@ -41,24 +41,41 @@ class Sridentify(object):
             raise FileNotFoundError("%s not found" % self.dbpath)
         self.conn = sqlite3.connect(self.dbpath)
 
+    def handle_error(self, exc, msg):
+        """
+        Determine how to handle an error and what message to
+        display to the user.
+        :param exc: Exception
+        :param msg: str, the message to display to the user
+        :return: None
+        """
+        if self.mode == "api":
+            raise exc
+        elif self.mode == "cli":
+            sys.stderr.write(msg)
+            sys.exit(1)
+
     def from_file(self, path):
         if not os.path.exists(path):
-            msg = "ERROR - No such file: '%s'" % path
-            if self.mode == 'api':
-                raise FileNotFoundError(msg)
-            elif self.mode == 'cli':
-                sys.exit(msg)
+            self.handle_error(
+                FileNotFoundError,
+                "ERROR - No such file: '{}'".format(path)
+            )
+        with open(path, "rb") as fp:
+            try:
+                self.prj = fp.read(1024)
+            except IOError as exc:
+                self.handle_error(
+                    exc,
+                    """ERROR - Unable to read\n{}\nfrom the filesystem.
+                Does it exist and do you have the necessary permissions?\n""".format(path)
+            )
         try:
-            with open(path, "r") as fp:
-                self.prj = fp.read()
-        except IOError:
-            msg = """ERROR - Unable to read\n%s\nfrom the filesystem.
-            Does it exist and do you have the necessary permissions?\n""" % path
-            if self.mode == 'api':
-                raise IOError(msg)
-            elif self.mode == 'cli':
-                sys.stderr.write(msg)
-                sys.exit(1)
+            self.prj = self.prj.decode('utf-8')
+        except UnicodeDecodeError as exc: self.handle_error(
+                exc,
+                "ERROR: {} does not appear to be a .prj file or is in an unknown character encoding".format(path)
+            )
 
     def get_epsg(self):
         """

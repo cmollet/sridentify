@@ -14,7 +14,7 @@ class FromFileTest(unittest.TestCase):
         self.prj_file = os.path.join(self.fixtures_dir, 'Central_Business_District.prj')
         self.fake_prj = os.path.join(self.fixtures_dir, 'not_a_real.prj')
 
-    def test_non_text_file_returns_none(self):
+    def test_non_text_file_raises_exception(self):
         ident = Sridentify(call_remote_api=False)
         ident.from_file(
             os.path.join(
@@ -22,4 +22,5 @@ class FromFileTest(unittest.TestCase):
                 'Central_Business_District.dbf'
             )
         )
-        self.assertIsNone(ident.get_epsg())
+        with self.assertRaises(UnicodeDecodeError):
+            ident.get_epsg()
