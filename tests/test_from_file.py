@@ -16,11 +16,39 @@ class FromFileTest(unittest.TestCase):
 
     def test_non_text_file_raises_exception(self):
         ident = Sridentify(call_remote_api=False)
+        with self.assertRaises(UnicodeDecodeError):
+            ident.from_file(
+                os.path.join(
+                    self.fixtures_dir,
+                    'Central_Business_District.dbf'
+                )
+            )
+
+    def test_non_text_file_does_not_raise_if_not_strict(self):
+
+        ident = Sridentify(call_remote_api=False, strict=False)
         ident.from_file(
             os.path.join(
                 self.fixtures_dir,
                 'Central_Business_District.dbf'
             )
+        )  # should not raise
+        self.assertIsNone(ident.get_epsg())
+
+    def test_from_file_on_large_file_does_not_load_entirety_into_memory(self):
+        ident = Sridentify(call_remote_api=False, strict=False)
+        ident.from_file(
+            # on my system `du -b` reports this file to be 23004 bytes
+            os.path.join(
+                self.fixtures_dir,
+                'Central_Business_District.shp'
+            )
         )
-        with self.assertRaises(UnicodeDecodeError):
-            ident.get_epsg()
+        self.assertLess(
+            sys.getsizeof(ident.prj),
+            1200
+            # from_file only requests the first 1024 bytes, but
+            # there could be some GC overhead with sys.getsizeof,
+            # so we mark it up a little bit here.
+            # https://docs.python.org/3/library/sys.html#sys.getsizeof
+        )

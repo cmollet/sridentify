@@ -26,12 +26,21 @@ logging.basicConfig(level=logging.INFO, format=log_fmt)
 
 class Sridentify(object):
 
-    def __init__(self, dbpath=None, prj=None, epsg_code=None, mode='api', call_remote_api=True):
+    def __init__(
+        self,
+        dbpath=None,
+        prj=None,
+        epsg_code=None,
+        mode='api',
+        call_remote_api=True,
+        strict=True
+    ):
         self.dbpath = dbpath
         self.prj = prj
         self.epsg_code = epsg_code
         self.mode = mode
         self.call_remote_api = call_remote_api
+        self.strict = strict
 
         if self.dbpath is None:
             self.dbpath = os.path.abspath(os.path.join(
@@ -50,7 +59,9 @@ class Sridentify(object):
         :return: None
         """
         if self.mode == "api":
-            raise exc
+            logger.error(msg)
+            if self.strict:
+                raise exc
         elif self.mode == "cli":
             sys.stderr.write(msg)
             sys.exit(1)
@@ -72,7 +83,8 @@ class Sridentify(object):
             )
         try:
             self.prj = self.prj.decode('utf-8')
-        except UnicodeDecodeError as exc: self.handle_error(
+        except UnicodeDecodeError as exc:
+            self.handle_error(
                 exc,
                 "ERROR: {} does not appear to be a .prj file or is in an unknown character encoding".format(path)
             )

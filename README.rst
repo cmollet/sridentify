@@ -114,6 +114,17 @@ Python API usage
     >>> ident.get_epsg()  # would return None
     >>>
 
+    >>> # Instantiate with strict=False to log errors and return None
+    >>> # instead of raising Exceptions when trying to read in problematic files.
+    >>> ident = Sridentify(strict=False)
+    >>> # example: accidentally trying to read in a binary file
+    >>> ident.from_file('seattle_land_use.shp') # this would log an error message
+    >>> ident.get_epsg()  # would return None
+    >>> ident = Sridentify(strict=True)  # the default
+    >>> ident.from_file('seattle_land_use.shp')
+    UnicodeDecodeError: 'utf-8' codec can't decode byte 0x88 in position 10: invalid start byte
+
+
 
 Background
 ----------
@@ -127,7 +138,7 @@ ESRI Shapefiles are a common format for publishing GIS data, although a "shapefi
 EPSG database. If that's what you need, you're probably looking for something like `python-epsg <https://github.com/geo-data/python-epsg>`__.
 
 Rather, ``sridentify`` is for those looking to quickly identify the EPSG code
-of a shapefile, especially when `importing into PostGIS <http://postgis.net/docs/manual-2.2/using_postgis_dbmanagement.html#shp2pgsql_usage>`__ . Of course, you could use `ogr2ogr <http://www.gdal.org/ogr2ogr.html>`__
+of a shapefile, especially when `importing into PostGIS <http://postgis.net/docs/manual-2.2/using_postgis_dbmanagement.html#shp2pgsql_usage>`__. Of course, you could use `ogr2ogr <http://www.gdal.org/ogr2ogr.html>`__
 to convert everything into a web-friendly projection, like:
 
 .. code:: bash
