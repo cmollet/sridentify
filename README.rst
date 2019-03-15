@@ -24,6 +24,9 @@ several partial matches is currently planned, but not yet implemented. This feat
 Installation
 ------------
 
+Linux, OS X, other *nixes
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ``pip install --user sridentify``
 
 The ``--user`` is important if installing system-wide (i.e., not in a virtualenv), because the
@@ -32,7 +35,12 @@ user running ``sridentify`` must have write permissions on the SQLite database i
 
 On most Linux systems ``pip install --user`` will install to ``$HOME/.local`` and place the executable script
 in ``$HOME/.local/bin``. You should add this to your ``$PATH`` if you want to run ``sridentify``
-without having to specify the full location to the executable. On OS X and Windows ``pip install --user`` should install it to somewhere already in your ``$PATH``, but this may depend on how Python/pip was installed on those systems.
+without having to specify the full location to the executable. On OS X ``pip install --user`` should install it to somewhere already in your ``$PATH``, but this may depend on how Python and/or pip was installed.
+
+Windows
+^^^^^^^
+
+`Anaconda <https://anaconda.com>`_ is your best bet for installing ``sridentify`` on Windows. Assuming you have installed Anaconda, then launching an Anaconda prompt (should be available in the Start menu under Anaconda) and running ``pip install sridentify`` should work and make the ``sridentify`` executable available on your ``$PATH``. If you don't want to or cannot use Anaconda you should also be able to build and install it systemwide or in any virtual environment with `setuptools <https://packaging.python.org/tutorials/installing-packages/>`_.
 
 Quickstart
 ----------
