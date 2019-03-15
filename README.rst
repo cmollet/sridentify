@@ -40,7 +40,7 @@ without having to specify the full location to the executable. On OS X ``pip ins
 Windows
 ^^^^^^^
 
-`Anaconda <https://anaconda.com>`_ is your best bet for installing ``sridentify`` on Windows. Assuming you have installed Anaconda, then launching an Anaconda prompt (should be available in the Start menu under Anaconda) and running ``pip install sridentify`` should work and make the ``sridentify`` executable available on your ``$PATH``. If you don't want to or cannot use Anaconda you should also be able to build and install it systemwide or in any virtual environment with `setuptools <https://packaging.python.org/tutorials/installing-packages/>`_.
+`Anaconda <https://anaconda.com>`_ is your best bet for installing ``sridentify`` on Windows. Assuming you have installed Anaconda, then launching an Anaconda prompt (should be available in the Start menu under Anaconda) and running ``pip install sridentify`` should work and make the ``sridentify`` executable available on your ``%PATH%``. If you don't want to or cannot use Anaconda you should also be able to build and install ``sridentify`` systemwide or in any virtual environment with `setuptools <https://packaging.python.org/tutorials/installing-packages/>`_.
 
 Quickstart
 ----------
