@@ -63,3 +63,6 @@ target/
 
 # PyCharm
 .idea/
+
+# Default virtualenv name suggested in CONTRIBUTING.rst
+sridentify-env
