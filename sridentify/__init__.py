@@ -168,3 +168,27 @@ class Sridentify(object):
             self.conn.rollback()
             logger.warning("%s is already in the database" % self.prj)
         self.conn.commit()
+
+    def from_epsg(self, epsg_code):
+        """
+        Loads self.prj by epsg_code.
+        If prjtext not found returns False.
+        """
+        self.epsg_code = epsg_code
+        assert isinstance(self.epsg_code, int)
+        cur = self.conn.cursor()
+        cur.execute("SELECT prjtext FROM prj_epsg WHERE epsg_code = ?", (self.epsg_code,))
+        result = cur.fetchone()
+        if result is not None:
+            self.prj = result[0]
+            return True
+
+        return False
+
+
+    def to_prj(self, filename):
+        """
+        Saves prj WKT to given file.
+        """
+        with open(filename, "w") as fp:
+            fp.write(self.prj)
