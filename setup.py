@@ -9,7 +9,7 @@ DESCRIPTIOIN = 'Identify the EPSG code from a .prj file'
 URL = 'https://github.com/cmollet/sridentify'
 EMAIL = 'contact@corymollet.com'
 AUTHOR = 'Cory Mollet'
-VERSION = '0.7.0'
+VERSION = '0.8.0'
 
 
 with open('README.rst') as readme_file:
