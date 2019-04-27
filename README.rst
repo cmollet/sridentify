@@ -130,7 +130,12 @@ Python API usage
     >>> ident.get_epsg()  # would return None
     >>> ident = Sridentify(strict=True)  # the default
     >>> ident.from_file('seattle_land_use.shp')
-    UnicodeDecodeError: 'utf-8' codec can't decode byte 0x88 in position 10: invalid start byte
+    >>> # Will raise UnicodeDecodeError: 'utf-8' codec can't decode byte 0x88 in position 10: invalid start byte
+
+    >>> # Write out a WKT string in the database to a file
+    >>> ident = Sridentify()
+    >>> ident.from_epsg(4269)
+    >>> ident.to_prj('/path/to/4269.prj')
 
 
 
